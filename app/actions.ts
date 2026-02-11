@@ -6,28 +6,34 @@ export async function roastResume(resumeText: string, jobDescription: string) {
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) return "API Key missing in Vercel settings.";
 
-  // Explicitly setting the API version to v1 fixes the 404 error
   const genAI = new GoogleGenerativeAI(apiKey);
   
   try {
-    // Specifying the model version "gemini-1.5-flash"
+    // Switching to the specific model you have access to
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-3.0-flash", 
     });
 
-    const prompt = `You are the Hizaki Labs Resume Auditor. 
-    Analyze this resume against the JD with professional, cold brilliance.
-    JD: ${jobDescription}
-    Resume: ${resumeText}`;
+    const prompt = `
+      CONTEXT: You are the Lead AI Auditor at Hizaki Labs.
+      TASK: Conduct a high-level professional audit of the following resume against the provided Job Description.
+      TONE: Analytical, brilliant, and cold. Do not sugarcoat failures.
+      
+      JOB DESCRIPTION: 
+      ${jobDescription}
+      
+      RESUME CONTENT: 
+      ${resumeText}
+      
+      FORMAT: Use professional headings. Include a "Likeliness to Hire" percentage and a list of "Critical Deficiencies."
+    `;
 
-    // Note: If you still see a 404, we add the apiVersion: "v1" 
-    // to the GoogleGenerativeAI constructor if your SDK version supports it.
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    return response.text();
+    return result.response.text();
     
   } catch (error: any) {
     console.error("Gemini Error:", error);
+    // If 3.0-flash also 404s, it might need the exact string "models/gemini-3.0-flash"
     return `Audit Failed: ${error.message}`;
   }
 }
