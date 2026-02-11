@@ -3,19 +3,19 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function roastResume(resumeText: string, jobDescription: string) {
-  // 1. Validate that the API key exists
   const apiKey = process.env.GOOGLE_API_KEY;
-  if (!apiKey) {
-    return "Error: API Key is missing in Vercel environment variables.";
-  }
+  if (!apiKey) return "API Key missing in Vercel settings.";
 
   const genAI = new GoogleGenerativeAI(apiKey);
   
-  // 2. Try 1.5-flash if 2.0-flash is giving you trouble
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+  // Using 'gemini-1.5-flash' is correct, but the SDK sometimes 
+  // needs the version to be explicit if it's defaulting to v1beta.
+  const model = genAI.getGenerativeModel({ 
+    model: "gemini-1.5-flash",
+  });
 
   const prompt = `You are the Hizaki Labs Resume Auditor. 
-  Critique this resume against the JD with professional brutality.
+  Analyze this resume against the JD with professional, cold brilliance.
   JD: ${jobDescription}
   Resume: ${resumeText}`;
 
@@ -24,8 +24,8 @@ export async function roastResume(resumeText: string, jobDescription: string) {
     const response = await result.response;
     return response.text();
   } catch (error: any) {
-    console.error("Gemini API Error:", error);
-    // This will show the actual error in your Vercel logs
-    return `Audit Failed: ${error.message || "Unknown AI Error"}`;
+    // This will output the specific error to your Vercel logs so we can see it
+    console.error("Gemini Error:", error);
+    return `Audit Failed: ${error.message}`;
   }
 }
