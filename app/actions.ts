@@ -1,33 +1,31 @@
-"use strict";
 "use server";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function roastResume(resumeText: string, jobDescription: string) {
-  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  // 1. Validate that the API key exists
+  const apiKey = process.env.GOOGLE_API_KEY;
+  if (!apiKey) {
+    return "Error: API Key is missing in Vercel environment variables.";
+  }
 
-  const prompt = `
-    You are a cynical, overworked, yet highly skilled Senior Technical Recruiter who has seen 10,000 bad resumes. 
-    Your job is to "Roast" this resume based on the provided Job Description.
+  const genAI = new GoogleGenerativeAI(apiKey);
+  
+  // 2. Try 1.5-flash if 2.0-flash is giving you trouble
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    RULES:
-    1. Be brutally honest and sarcastic. 
-    2. Point out generic buzzwords, formatting nightmares, and lack of impact.
-    3. If the resume doesn't match the job description at all, call them out on it.
-    4. End with a "Redemption" section: 3 clear, actionable bullet points to fix the mess.
-
-    JOB DESCRIPTION: ${jobDescription}
-    RESUME TEXT: ${resumeText}
-
-    Format the response in clean Markdown.
-  `;
+  const prompt = `You are the Hizaki Labs Resume Auditor. 
+  Critique this resume against the JD with professional brutality.
+  JD: ${jobDescription}
+  Resume: ${resumeText}`;
 
   try {
     const result = await model.generateContent(prompt);
-    return result.response.text();
-  } catch (error) {
-    console.error(error);
-    return "The AI is too disgusted to speak. (Check your API key or rate limits).";
+    const response = await result.response;
+    return response.text();
+  } catch (error: any) {
+    console.error("Gemini API Error:", error);
+    // This will show the actual error in your Vercel logs
+    return `Audit Failed: ${error.message || "Unknown AI Error"}`;
   }
 }
