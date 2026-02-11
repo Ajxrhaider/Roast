@@ -4,36 +4,37 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function roastResume(resumeText: string, jobDescription: string) {
   const apiKey = process.env.GOOGLE_API_KEY;
-  if (!apiKey) return "API Key missing in Vercel settings.";
+  if (!apiKey) return "Intelligence Core Offline: API Key missing.";
 
   const genAI = new GoogleGenerativeAI(apiKey);
   
   try {
-    // Switching to the specific model you have access to
+    // The exact model ID for your tier is gemini-3-flash-preview
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-3.0-flash", 
+      model: "gemini-3-flash-preview" 
     });
 
     const prompt = `
-      CONTEXT: You are the Lead AI Auditor at Hizaki Labs.
-      TASK: Conduct a high-level professional audit of the following resume against the provided Job Description.
-      TONE: Analytical, brilliant, and cold. Do not sugarcoat failures.
+      AUDIT PROTOCOL: Hizaki Labs v3.0
+      TASK: Audit the following resume against the Job Description.
+      TONE: Analytical, precise, and brutally professional.
       
       JOB DESCRIPTION: 
       ${jobDescription}
       
-      RESUME CONTENT: 
+      CANDIDATE DATA: 
       ${resumeText}
       
-      FORMAT: Use professional headings. Include a "Likeliness to Hire" percentage and a list of "Critical Deficiencies."
+      REQUIREMENT: Provide a breakdown of "Technical Gaps" and a "System Score" (0-100).
     `;
 
     const result = await model.generateContent(prompt);
-    return result.response.text();
+    const response = await result.response;
+    return response.text();
     
   } catch (error: any) {
-    console.error("Gemini Error:", error);
-    // If 3.0-flash also 404s, it might need the exact string "models/gemini-3.0-flash"
-    return `Audit Failed: ${error.message}`;
+    console.error("Audit Error:", error);
+    // If it still 404s, it's a model routing issue.
+    return `Audit Failed: ${error.message}. Please verify the model ID 'gemini-3-flash-preview' in your region.`;
   }
 }
