@@ -1,0 +1,17 @@
+{
+  "requires": true,
+  "lockfileVersion": 1,
+  "dependencies": {
+    "@google/generative-ai": {
+      "version": "0.24.1",
+      "resolved": "https://registry.npmjs.org/@google/generative-ai/-/generative-ai-0.24.1.tgz",
+      "integrity": "sha512-MqO+MLfM6kjxcKoy0p1wRzG3b4ZZXtPI+z2IE26UogS2Cm/XHO+7gGRBh6gcJsOiIVoH93UwKvW4HdgiOZCy9Q=="
+    }
+  }
+}
+"dependencies": {
+  "next": "15.x.x",
+  "react": "19.x.x",
+  "react-dom": "19.x.x",
+  "@google/generative-ai": "^0.21.0"
+}     
