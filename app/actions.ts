@@ -12,7 +12,7 @@ export async function roastResume(resumeText: string, jobDescription: string) {
   const genAI = new GoogleGenerativeAI(apiKey);
   
   // 2. Try 1.5-flash if 2.0-flash is giving you trouble
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
   const prompt = `You are the Hizaki Labs Resume Auditor. 
   Critique this resume against the JD with professional brutality.
